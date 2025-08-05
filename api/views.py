@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from inference.models import toxic_classifier, insult_classifier, hate_classifier
+from api.inference.models import toxic_classifier, insult_classifier, hate_classifier
 
 def classify_text(request, classifier):
     text = request.data.get("text")
