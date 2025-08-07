@@ -1,11 +1,17 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_429_TOO_MANY_REQUESTS
 from drf_yasg.utils import swagger_auto_schema
+from django_ratelimit.decorators import ratelimit
 from api.inference.models import toxic_classifier, insult_classifier, hate_classifier
 from api.docs.schemas import input_schema, responses
 
 def classify_text(request, classifier):
+    if getattr(request, 'limited', False):
+        return Response(
+            {"error": "Rate limit exceeded."},
+            status=HTTP_429_TOO_MANY_REQUESTS
+        )
     text = request.data.get("text")
     if not text:
         return Response(
@@ -24,6 +30,7 @@ def register_endpoint(name, classifier, summary):
         responses=responses,
         tags=["Classification"]
     )
+    @ratelimit(key='ip', rate='10/m', block=False)
     @api_view(["POST"])
     def view(request):
         return classify_text(request, classifier)

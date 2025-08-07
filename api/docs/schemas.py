@@ -26,7 +26,7 @@ output_schema = openapi.Schema(
     }
 )
 
-error_schema = openapi.Schema(
+bad_request_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
         "error": openapi.Schema(
@@ -36,7 +36,18 @@ error_schema = openapi.Schema(
     }
 )
 
+rate_limit_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "detail": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            example="Rate limit exceeded."
+        )
+    }
+)
+
 responses = {
     200: openapi.Response("Successful classification", output_schema),
-    400: openapi.Response("Missing 'text' field", schema=error_schema),
+    400: openapi.Response("Bad request", schema=bad_request_schema),
+    429: openapi.Response("Too many requests", schema=rate_limit_schema),
 }
