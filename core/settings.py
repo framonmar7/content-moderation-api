@@ -61,8 +61,6 @@ TEMPLATES = [
     },
 ]
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
-
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
@@ -75,3 +73,17 @@ SWAGGER_SETTINGS = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+    },
+}
+
+RATELIMIT_USE_CACHE = 'default'
+RATELIMIT_IP_META_KEY = 'HTTP_X_FORWARDED_FOR'
+RATELIMIT_CACHE_TTL = 60
